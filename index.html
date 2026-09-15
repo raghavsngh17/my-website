@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeForge Academy — Learn to build for real</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#171b21;
+    --panel:#20262f;
+    --panel-2:#262d38;
+    --paper:#ece7dc;
+    --paper-dim:#b7b2a6;
+    --amber:#e8a93e;
+    --amber-dim:#8a6a2f;
+    --slate:#8a93a3;
+    --moss:#6fa98c;
+    --line: rgba(236,231,220,0.12);
+    --radius: 3px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    line-height:1.15;
+    margin:0 0 0.4em 0;
+    color:var(--paper);
+  }
+  a{color:inherit;}
+  p{color:var(--slate);}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* NAV */
+  header{
+    position:sticky; top:0; z-index:40;
+    background:rgba(23,27,33,0.88);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 0;
+  }
+  .brand{
+    font-family:'Fraunces',serif; font-weight:600; font-size:1.25rem;
+    letter-spacing:0.2px; display:flex; align-items:center; gap:8px;
+  }
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--amber); display:inline-block;}
+  .navlinks{display:flex; gap:34px; font-size:0.94rem;}
+  .navlinks a{text-decoration:none; color:var(--paper); opacity:0.78; transition:opacity .15s;}
+  .navlinks a:hover{opacity:1;}
+  .navlinks a:focus-visible, a:focus-visible, button:focus-visible{outline:2px solid var(--amber); outline-offset:3px;}
+  .nav-cta{
+    background:var(--amber); color:var(--ink); border:none;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:0.9rem;
+    padding:10px 20px; border-radius:var(--radius); cursor:pointer;
+  }
+  .menu-btn{display:none; background:none; border:none; color:var(--paper); font-size:1.5rem; cursor:pointer;}
+  @media (max-width:760px){
+    .navlinks{display:none;}
+    .nav-cta{display:none;}
+    .menu-btn{display:block;}
+    .navlinks.open{
+      display:flex; flex-direction:column; gap:0;
+      position:absolute; top:64px; left:0; right:0;
+      background:var(--panel); padding:8px 20px 20px;
+      border-bottom:1px solid var(--line);
+    }
+    .navlinks.open a{padding:12px 0; border-bottom:1px solid var(--line); opacity:1;}
+  }
+
+  /* HERO */
+  .hero{padding:88px 0 96px;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:64px; align-items:center;}
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr; gap:48px;} }
+  .kicker{
+    font-size:0.92rem; color:var(--amber); font-weight:500;
+    margin-bottom:14px; display:flex; align-items:center; gap:10px;
+  }
+  .kicker::before{content:""; width:20px; height:1px; background:var(--amber-dim); display:inline-block;}
+  .hero h1{font-size:clamp(2.1rem, 4.4vw, 3.4rem); max-width:11ch;}
+  .hero p.lede{font-size:1.08rem; max-width:46ch; margin-top:18px; color:#c7c2b6;}
+  .hero-actions{display:flex; gap:16px; margin-top:32px; align-items:center; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--amber); color:var(--ink); border:none; text-decoration:none;
+    font-weight:600; padding:13px 26px; border-radius:var(--radius); font-size:0.96rem;
+    display:inline-block; cursor:pointer;
+  }
+  .btn-ghost{
+    color:var(--paper); text-decoration:none; font-weight:500; font-size:0.96rem;
+    border-bottom:1px solid var(--paper-dim); padding-bottom:2px;
+  }
+
+  /* code editor mock */
+  .editor{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px;
+    overflow:hidden; box-shadow:0 20px 50px -20px rgba(0,0,0,0.6);
+  }
+  .editor-bar{
+    display:flex; gap:7px; padding:11px 14px; border-bottom:1px solid var(--line);
+    background:var(--panel-2);
+  }
+  .editor-bar span{width:10px; height:10px; border-radius:50%; background:#454c58; display:inline-block;}
+  .editor-body{padding:22px 22px 26px; font-family:'JetBrains Mono', monospace; font-size:0.86rem; min-height:220px;}
+  .editor-body .ln{color:#565f6d; display:inline-block; width:18px; user-select:none;}
+  .editor-body .code-line{white-space:pre; opacity:0; animation:fadein .4s forwards;}
+  .tok-key{color:#e8a93e;} .tok-str{color:#6fa98c;} .tok-fn{color:#7fb0e0;} .tok-com{color:#565f6d;}
+  @keyframes fadein{to{opacity:1;}}
+  .cursor{display:inline-block; width:7px; height:15px; background:var(--amber); vertical-align:middle; animation:blink 1s step-end infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  section{padding:88px 0; border-top:1px solid var(--line);}
+  .section-head{max-width:56ch; margin-bottom:52px;}
+  .section-head h2{font-size:clamp(1.6rem, 2.8vw, 2.2rem);}
+  .section-head p{margin-top:12px; font-size:1.02rem;}
+
+  /* ABOUT */
+  .about-grid{display:grid; grid-template-columns:1fr 1fr; gap:56px;}
+  @media (max-width:800px){ .about-grid{grid-template-columns:1fr;} }
+  .about-copy p{margin-bottom:16px; color:#c7c2b6; font-size:1rem;}
+  .stat-strip{
+    margin-top:28px; padding-top:24px; border-top:1px solid var(--line);
+    display:flex; gap:40px; flex-wrap:wrap;
+  }
+  .stat-strip div b{
+    font-family:'Fraunces',serif; font-size:1.9rem; color:var(--paper); display:block; font-weight:600;
+  }
+  .stat-strip div span{font-size:0.85rem; color:var(--slate);}
+  .instructor-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:28px;
+  }
+  .instructor-card .role{color:var(--amber); font-size:0.85rem; font-weight:500; margin-bottom:6px;}
+  .instructor-card p{font-size:0.95rem; margin-top:14px;}
+
+  /* COURSES */
+  .course-path{border-top:1px solid var(--line);}
+  .course-row{
+    display:grid; grid-template-columns:46px 1fr auto; gap:22px; align-items:start;
+    padding:28px 0; border-bottom:1px solid var(--line);
+  }
+  .course-row .step{
+    font-family:'JetBrains Mono',monospace; color:var(--amber-dim); font-size:0.85rem; padding-top:4px;
+  }
+  .course-row h3{font-size:1.15rem; margin-bottom:6px;}
+  .course-row p{font-size:0.95rem; max-width:52ch;}
+  .course-meta{
+    text-align:right; display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+  }
+  .chip{
+    font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--slate);
+    border:1px solid var(--line); padding:4px 9px; border-radius:20px; white-space:nowrap;
+  }
+  .level{font-size:0.78rem; color:var(--moss);}
+  @media (max-width:640px){
+    .course-row{grid-template-columns:32px 1fr; }
+    .course-meta{grid-column:2; text-align:left; align-items:flex-start; flex-direction:row; margin-top:8px;}
+  }
+
+  /* TESTIMONIAL */
+  .quote-block{
+    border-top:1px solid var(--line); padding-top:52px;
+    display:grid; grid-template-columns:1fr 1fr; gap:56px;
+  }
+  @media (max-width:800px){ .quote-block{grid-template-columns:1fr; gap:36px;} }
+  .quote-block blockquote{
+    margin:0; font-family:'Fraunces',serif; font-size:1.35rem; font-weight:500; line-height:1.4;
+    color:var(--paper);
+  }
+  .quote-block cite{
+    display:block; margin-top:16px; font-style:normal; font-size:0.88rem; color:var(--slate);
+  }
+
+  /* CONTACT */
+  .contact-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:64px;}
+  @media (max-width:800px){ .contact-grid{grid-template-columns:1fr; gap:40px;} }
+  .contact-info dl{margin:0;}
+  .contact-info dt{color:var(--slate); font-size:0.82rem; margin-top:20px;}
+  .contact-info dd{margin:4px 0 0; font-size:1.02rem;}
+  form{display:flex; flex-direction:column; gap:18px;}
+  label{font-size:0.85rem; color:var(--slate); margin-bottom:6px; display:block;}
+  input, textarea, select{
+    width:100%; background:var(--panel); border:1px solid var(--line); color:var(--paper);
+    padding:12px 14px; border-radius:var(--radius); font-family:'Inter',sans-serif; font-size:0.95rem;
+  }
+  input:focus, textarea:focus, select:focus{outline:2px solid var(--amber); outline-offset:1px; border-color:transparent;}
+  textarea{resize:vertical; min-height:100px;}
+  .field{width:100%;}
+  .submit-row{display:flex; align-items:center; gap:16px;}
+  .form-note{font-size:0.82rem; color:var(--slate); display:none;}
+  .form-note.show{display:block;}
+
+  footer{border-top:1px solid var(--line); padding:40px 0; }
+  .foot-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;}
+  .foot-row p{font-size:0.85rem; margin:0;}
+  .foot-links{display:flex; gap:24px; font-size:0.85rem;}
+  .foot-links a{text-decoration:none; color:var(--slate);}
+  .foot-links a:hover{color:var(--paper);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="brand"><span class="dot"></span>CodeForge Academy</div>
+      <div class="navlinks" id="navlinks">
+        <a href="#about">About</a>
+        <a href="#courses">Courses</a>
+        <a href="#stories">Stories</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView()">Enroll now</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" style="border-top:none;">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="kicker">Practical coding education</div>
+      <h1>Learn to build for real, not just to pass a quiz</h1>
+      <p class="lede">CodeForge teaches web and Android development the way working developers actually learn it: by shipping small, real projects every week, guided by people who build software for a living.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#courses">See the courses</a>
+        <a class="btn-ghost" href="#about">Why CodeForge</a>
+      </div>
+    </div>
+    <div class="editor">
+      <div class="editor-bar"><span></span><span></span><span></span></div>
+      <div class="editor-body" id="editorBody"></div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Built by developers who kept getting asked "where did you learn this?"</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-copy">
+        <p>CodeForge started in 2023 as evening sessions run out of a co-working space, teaching three friends how to ship their first React app. Word spread, and the sessions turned into a proper course.</p>
+        <p>We keep every cohort small enough that an instructor can look at your code, not just your grade. Each course ends with a project you actually own: something you can put in a portfolio or a resume, not a certificate that sits in a folder.</p>
+        <div class="stat-strip">
+          <div><b>1,240+</b><span>students trained</span></div>
+          <div><b>96%</b><span>finish their capstone project</span></div>
+          <div><b>4</b><span>courses, one clear path</span></div>
+        </div>
+      </div>
+      <div class="instructor-card">
+        <div class="role">Lead instructor</div>
+        <h3>Aditi Rao</h3>
+        <p>Nine years building web and mobile products, five of them mentoring junior developers on the job. Aditi designed the CodeForge curriculum around the mistakes she sees new developers make most often, and the habits that fix them.</p>
+        <p>"I don't want students who can recite a syntax. I want students who can open a blank file and build something that works."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="courses">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>A path, not a playlist</h2>
+      <p>Take these in order and you'll go from your first line of code to a working app you built yourself. Each course builds directly on the last.</p>
+    </div>
+    <div class="course-path">
+      <div class="course-row">
+        <div class="step">01</div>
+        <div>
+          <h3>JavaScript Fundamentals</h3>
+          <p>Variables, functions, arrays and the DOM, taught through eight small browser projects instead of slides.</p>
+        </div>
+        <div class="course-meta">
+          <span class="chip">4 weeks</span>
+          <span class="level">Beginner</span>
+        </div>
+      </div>
+      <div class="course-row">
+        <div class="step">02</div>
+        <div>
+          <h3>Web Development Bootcamp</h3>
+          <p>HTML, CSS and JavaScript combined into full pages, then connected to a backend and a real database.</p>
+        </div>
+        <div class="course-meta">
+          <span class="chip">8 weeks</span>
+          <span class="level">Beginner–Intermediate</span>
+        </div>
+      </div>
+      <div class="course-row">
+        <div class="step">03</div>
+        <div>
+          <h3>React Mastery</h3>
+          <p>Component thinking, state management and hooks, ending with a multi-page app deployed to the web.</p>
+        </div>
+        <div class="course-meta">
+          <span class="chip">6 weeks</span>
+          <span class="level">Intermediate</span>
+        </div>
+      </div>
+      <div class="course-row">
+        <div class="step">04</div>
+        <div>
+          <h3>Android App Development</h3>
+          <p>Build and publish a working Android app, from your first activity to a listing on the Play Store.</p>
+        </div>
+        <div class="course-meta">
+          <span class="chip">7 weeks</span>
+          <span class="level">Intermediate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stories">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What changed for past students</h2>
+    </div>
+    <div class="quote-block">
+      <div>
+        <blockquote>"I'd tried three other tutorials and never finished one. Here I shipped an app in week seven and actually understood every line of it."</blockquote>
+        <cite>Priya Nair — Web Development Bootcamp, 2025</cite>
+      </div>
+      <div>
+        <blockquote>"The feedback on my code was the first time anyone had actually read it. That's what got me my internship."</blockquote>
+        <cite>Karan Mehta — React Mastery, 2025</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Start with a conversation, not a checkout page</h2>
+      <p>Tell us where you're starting from and what you want to build. We'll point you to the right course, or tell you honestly if you're not ready yet.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <dl>
+          <dt>Email</dt>
+          <dd>hello@codeforgeacademy.example</dd>
+          <dt>Phone</dt>
+          <dd>+91 90000 00000</dd>
+          <dt>Studio</dt>
+          <dd>Guwahati, Assam — cohorts also run online</dd>
+          <dt>Office hours</dt>
+          <dd>Mon–Sat, 10am–6pm IST</dd>
+        </dl>
+      </div>
+      <form id="enrollForm">
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required>
+        </div>
+        <div class="field">
+          <label for="course">Which course are you interested in?</label>
+          <select id="course" name="course">
+            <option>JavaScript Fundamentals</option>
+            <option>Web Development Bootcamp</option>
+            <option>React Mastery</option>
+            <option>Android App Development</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">What do you want to be able to build?</label>
+          <textarea id="message" name="message"></textarea>
+        </div>
+        <div class="submit-row">
+          <button type="submit" class="btn-primary">Send message</button>
+          <span class="form-note" id="formNote">Thanks — we'll get back to you within a day.</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <p>© 2026 CodeForge Academy. A student-built demo site.</p>
+    <div class="foot-links">
+      <a href="#about">About</a>
+      <a href="#courses">Courses</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // mobile menu
+  document.getElementById('menuBtn').addEventListener('click', function(){
+    document.getElementById('navlinks').classList.toggle('open');
+  });
+
+  // form (demo only, no backend)
+  document.getElementById('enrollForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var note = document.getElementById('formNote');
+    note.classList.add('show');
+  });
+
+  // hero code editor typing reveal (single orchestrated moment)
+  var lines = [
+    [['tok-com','// app.js']],
+    [['tok-key','function '],['tok-fn','buildSomething'],['','() {']],
+    [['','  const '],['','skills = ['],['tok-str',"'html'"],['','' , ''],['tok-str',"'css'"],['','' , ''],['tok-str',"'js'"],['','' ];']],
+    [['','  return '],['tok-fn','ship'],['','(skills);']],
+    [['','}']],
+    [['tok-com','// week 1 of many']]
+  ];
+  var body = document.getElementById('editorBody');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function renderLine(tokens, idx){
+    var div = document.createElement('div');
+    div.className = 'code-line';
+    div.style.animationDelay = (idx*0.12)+'s';
+    var ln = document.createElement('span');
+    ln.className='ln'; ln.textContent = (idx+1);
+    div.appendChild(ln);
+    tokens.forEach(function(t){
+      var span = document.createElement('span');
+      if(t[0]) span.className = t[0];
+      span.textContent = t[1];
+      div.appendChild(span);
+    });
+    return div;
+  }
+  lines.forEach(function(tokens, idx){
+    var el = renderLine(tokens, idx);
+    if(reduce){ el.style.opacity = 1; el.style.animation='none'; }
+    body.appendChild(el);
+  });
+  var cur = document.createElement('span');
+  cur.className='cursor';
+  body.appendChild(cur);
+</script>
+
+</body>
+</html>
