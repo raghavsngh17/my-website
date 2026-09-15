@@ -258,6 +258,8 @@
         </dl>
       </div>
       <form id="enrollForm">
+        <input type="hidden" name="_subject" value="New enrollment inquiry — CodeForge Academy">
+        <input type="hidden" name="_template" value="table">
         <div class="field">
           <label for="name">Name</label>
           <input id="name" name="name" type="text" required>
@@ -282,8 +284,9 @@
           <textarea id="message" name="message"></textarea>
         </div>
         <div class="submit-row">
-          <button type="submit" class="btn-primary">Send message</button>
+          <button type="submit" class="btn-primary" id="submitBtn">Send message</button>
           <span class="form-note" id="formNote">Thanks — I'll get back to you within a day.</span>
+          <span class="form-note" id="formError">Something went wrong — please email me directly instead.</span>
         </div>
       </form>
     </div>
@@ -307,10 +310,41 @@
     document.getElementById('navlinks').classList.toggle('open');
   });
 
-  // ---- contact form (demo only, no backend) ----
+  // ---- contact form: sends real submissions to your email via FormSubmit.co (free, no signup) ----
+  // First time someone submits the form, FormSubmit will send a one-time
+  // "activate your form" email to rk3071456@gmail.com — click that link once
+  // to turn the form on. After that, every submission emails you automatically.
+  var FORM_ENDPOINT = 'https://formsubmit.co/ajax/rk3071456@gmail.com';
+
   document.getElementById('enrollForm').addEventListener('submit', function(e){
     e.preventDefault();
-    document.getElementById('formNote').classList.add('show');
+    var form = e.target;
+    var submitBtn = document.getElementById('submitBtn');
+    var note = document.getElementById('formNote');
+    var errorNote = document.getElementById('formError');
+    note.classList.remove('show');
+    errorNote.classList.remove('show');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    }).then(function(response){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send message';
+      if(response.ok){
+        note.classList.add('show');
+        form.reset();
+      } else {
+        errorNote.classList.add('show');
+      }
+    }).catch(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send message';
+      errorNote.classList.add('show');
+    });
   });
 
   // ---- course data: everything needed for each course lives here ----
